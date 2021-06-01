@@ -12,7 +12,7 @@ get_links_i2c <- function(){
   links_to_get <- paste0('https://i2c.tuwien.ac.at/event/page/',
                          1:5)
   ret_df <- rbindlist(lapply(links_to_get, function(i2c_url){
-    
+    i2c_url <- 'https://i2c.tuwien.ac.at/event/page/2'
     i2c_news_page <- read_html(i2c_url)
     
     t <- i2c_news_page %>%
@@ -30,7 +30,20 @@ get_links_i2c <- function(){
                                      html_nodes('img') %>% 
                                      html_attr('src'),
                                    "no_image")
+    
+    for (i in t_list[['img_link']]) {
+      if(!is.na(t_list[['img_link']][count]) & !http_error(t_list[['img_link']][count])){
+        download.file(t_list[['img_link']][count], 
+                      destfile = paste0("i2c_files/i2c_img", 
+                                        counter,'.png'), 
+                      mode = 'wb')
+      }
+      count <- count + 1
+      counter <<- counter + 1
+    }
+    
     print(paste("Currently scraping:",i2c_url))
+    
     return(data.frame(t_list))
   }))
   return(ret_df)
@@ -38,6 +51,17 @@ get_links_i2c <- function(){
 
 i2c_article_links <- get_links_i2c()
 
+# Download images outside of the scraping loop
+count <- 1
+for (i in i2c_article_links$img_link[i2c_article_links$img_link != "no_image"]) {
+  if(!is.na(i) & !http_error(i)){
+    download.file(i,
+                  destfile = paste0("i2c_files/i2c_img",
+                                    count,'.png'),
+                  mode = 'wb')
+  }
+  count <- count + 1
+}
 
 # Write out the list of article and image links
 write.csv(i2c_article_links, file = 'i2c_files/i2c_article_links.csv')

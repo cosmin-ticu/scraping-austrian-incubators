@@ -1,12 +1,15 @@
-# Read base df of all cotent
-all_incubators_raw_content <- read.csv(file = "data/incubators_all_raw_content.csv",
-        fileEncoding = "utf-8")
 
-# get rid of automated index
-all_incubators_raw_content <- all_incubators_raw_content[,-1]
+# Housekeeping ------------------------------------------------------------
 
+rm(list = ls())
 library(aws.comprehend)
 library(data.table)
+
+# Data setup --------------------------------------------------------------
+
+# Read base df of all content
+all_incubators_raw_content <- read.csv(file = "data/incubators_raw_content.csv",
+        fileEncoding = "utf-8")
 
 # Set up AWS in R
 keyTable <- read.csv("D:/OneDrive - Central European University/Courses/Spring_Term/Data Science 3/accessKeys.csv", 
@@ -18,6 +21,8 @@ AWS_SECRET_ACCESS_KEY <- as.character(keyTable$Secret.access.key)
 Sys.setenv("AWS_ACCESS_KEY_ID" = AWS_ACCESS_KEY_ID,
            "AWS_SECRET_ACCESS_KEY" = AWS_SECRET_ACCESS_KEY,
            "AWS_DEFAULT_REGION" = "eu-west-1") 
+
+# Language detection with AWS ---------------------------------------------
 
 # Function that detects main language of article through AWS comprehend according to first 400 characters
 get_language_scores_400chars <- function(){
@@ -37,8 +42,10 @@ language_scores <- get_language_scores_400chars()
 
 all_incubators_raw_content_languages <- cbind(all_incubators_raw_content, language_scores)
 
+# Write out the data ------------------------------------------------------
+
 # Write base file containing full content
 write.csv(all_incubators_raw_content_languages , 
-          file = "data/all_incubators_raw_content_languages.csv",
+          file = "data/incubators_raw_content_languages.csv",
           fileEncoding = "utf-8",
           row.names = F)

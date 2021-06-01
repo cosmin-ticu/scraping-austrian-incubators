@@ -8,14 +8,16 @@ library(lubridate)
 
 # Get links of all A1 Startup articles (they have 7 pages of content)
 
-a1_url <- "https://www.a1startup.net/news/"
-
 get_links_a1 <- function(){
+
+  count <- 1
+  counter <- 1
+  
   links_to_get <- paste0('https://www.a1startup.net/news/page/',
                          1:7)
   
   ret_df <- rbindlist(lapply(links_to_get, function(a1_url){
-    
+
     a1_news_page <- read_html(a1_url)
     
     Sys.sleep(0.5)
@@ -32,6 +34,16 @@ get_links_a1 <- function(){
       html_nodes('.post-image') %>%
       html_nodes('img') %>% html_attr('src')
     
+    for (i in t_list[['img_link']]) {
+      if(!is.na(t_list[['img_link']][count])){
+        download.file(t_list[['img_link']][count], 
+                      destfile = paste0("a1_files/a1_img", counter,'.png'), 
+                      mode = 'wb')
+      }
+      count <- count + 1
+      counter <<- counter + 1
+    }
+    
     print(paste("Currently scraping:",a1_url))
     
     return(data.frame(t_list))
@@ -42,7 +54,8 @@ get_links_a1 <- function(){
 
 a1_article_links <- get_links_a1()
 
-values <- seq(from = as.Date("2015-01-01"), to = as.Date("2021-01-01"), by = 'month')
+values <- seq(from = as.Date("2015-01-01"), to = as.Date("2021-01-01"), 
+              by = 'month')
 
 values <- rev(tail(values, nrow(a1_article_links)))
 
@@ -56,7 +69,8 @@ get_articles_a1 <- function(){
                              function(a1_article_url){
                                t <- read_html(a1_article_url)
                                
-                               print(paste("Currently scraping:",a1_article_url))
+                               print(paste("Currently scraping:",
+                                           a1_article_url))
                                
                                t_list <- list()
                                

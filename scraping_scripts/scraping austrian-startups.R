@@ -24,6 +24,18 @@ get_links_austrianStartups <- function(){
     html_nodes('noscript') %>% 
     html_nodes('img') %>% html_attr('src')
   
+  count <- 1
+  
+  for (i in t_list[['img_link']]) {
+    if(!is.na(t_list[['img_link']][count])){
+      download.file(t_list[['img_link']][count], 
+                    destfile = paste0("austrianStartups_files/austrianStartups_img", 
+                                      count,'.png'), 
+                    mode = 'wb')
+    }
+    count <- count + 1
+  }
+  
   print(paste("Currently scraping:","https://austrianstartups.com/startup-news/"))
   
   return(data.frame(t_list))
@@ -32,7 +44,8 @@ get_links_austrianStartups <- function(){
 austrianStartups_article_links <- get_links_austrianStartups()
 
 # Write out the list of article and image links
-write.csv(austrianStartups_article_links, file = 'austrianStartups_files/austrianStartups_article_links.csv')
+write.csv(austrianStartups_article_links, 
+          file = 'austrianStartups_files/austrianStartups_article_links.csv')
 
 # Scrape the contents of each article
 
@@ -75,7 +88,8 @@ get_articles_austrianStartups <- function(){
 
 austrianStartups_articles_content <- get_articles_austrianStartups()
 
-austrianStartups_articles_content <- austrianStartups_articles_content[austrianStartups_articles_content$content != ""]
+austrianStartups_articles_content <- austrianStartups_articles_content[
+  austrianStartups_articles_content$content != ""]
 
 austrianStartups_articles_content <- merge(austrianStartups_articles_content, 
                                          austrianStartups_article_links,

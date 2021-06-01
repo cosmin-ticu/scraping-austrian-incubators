@@ -9,6 +9,9 @@ library(magrittr)
 
 get_links_agroInnovation_DE <- function(){
   
+  count <- 1
+  counter <- 1
+  
   links_to_get <- paste0('https://www.agroinnovationlab.com/de/news/page/',
                          1:8)
   
@@ -31,6 +34,17 @@ get_links_agroInnovation_DE <- function(){
       html_nodes('.fusion-image-wrapper') %>% 
       html_nodes('img') %>% html_attr('src')
     
+    for (i in t_list[['img_link']]) {
+      if(!is.na(t_list[['img_link']][count])){
+        download.file(t_list[['img_link']][count], 
+                      destfile = paste0("agroInnovation_files/agroInnovation_img", 
+                                        counter,'.png'), 
+                      mode = 'wb')
+      }
+      count <- count + 1
+      counter <<- counter + 1
+    }
+    
     print(paste("Currently scraping:",agroInnovation_url))
     
     return(data.frame(t_list))
@@ -43,6 +57,9 @@ agroInnovation_article_links_DE <- get_links_agroInnovation_DE()
 # Get links of all Agro Innovation Lab articles in English (they have 6 pages of content)
 
 get_links_agroInnovation_EN <- function(){
+  
+  count <- 1
+  counter <- 1
   
   links_to_get <- paste0('https://www.agroinnovationlab.com/news/page/',
                          1:6)
@@ -65,6 +82,17 @@ get_links_agroInnovation_EN <- function(){
       html_nodes('.fusion-post-wrapper') %>% 
       html_nodes('.fusion-image-wrapper') %>% 
       html_nodes('img') %>% html_attr('src')
+    
+    for (i in t_list[['img_link']]) {
+      if(!is.na(t_list[['img_link']][count])){
+        download.file(t_list[['img_link']][count], 
+                      destfile = paste0("agroInnovation_files/agroInnovation_EN_img", 
+                                        counter,'.png'), 
+                      mode = 'wb')
+      }
+      count <- count + 1
+      counter <<- counter + 1
+    }
     
     print(paste("Currently scraping:",agroInnovation_url))
     

@@ -47,6 +47,18 @@ tech2impact_article_links <- get_links_tech2impact()
 # Some articles showed up twice on account of having 2 images (only 1st image was kept)
 tech2impact_article_links <- tech2impact_article_links[!duplicated(tech2impact_article_links$article_link)]
 
+# Download images outside of the scraping loop
+count <- 1
+for (i in tech2impact_article_links$img_link[tech2impact_article_links$img_link != "no_image"]) {
+  if(!is.na(i) & !http_error(i)){
+    download.file(i,
+                  destfile = paste0("tech2impact_files/tech2impact_img",
+                                    count,'.png'),
+                  mode = 'wb')
+  }
+  count <- count + 1
+}
+
 # Write out the list of article and image links
 write.csv(tech2impact_article_links, file = 'tech2impact_files/tech2impact_article_links.csv')
 

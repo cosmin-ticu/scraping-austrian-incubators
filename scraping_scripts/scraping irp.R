@@ -15,7 +15,7 @@ get_links_irp <- function(){
     
     t_list[['article_link']] <- irp_blog_page %>% html_nodes('.entry-snippet') %>%
       html_nodes('h2') %>% html_nodes('a') %>% html_attr('href')
-    t_list[["img_link"]] <- "no_image"
+    t_list[["img_link"]] <- "no_image" # no images to download, unfortunately
     print(paste("Currently scraping:","https://investment-ready.org/blog/"))
     return(data.frame(t_list))
 }

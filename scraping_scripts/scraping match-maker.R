@@ -36,8 +36,21 @@ get_links_matchmaker <- function(){
 
 matchmaker_article_links <- get_links_matchmaker()
 
+# Download images outside of the scraping loop
+count <- 1
+for (i in matchmaker_article_links$img_link) {
+  if(!is.na(i) & !http_error(i)){
+    download.file(i,
+                  destfile = paste0("matchmaker_files/matchmaker_img",
+                                    count,'.png'),
+                  mode = 'wb')
+  }
+  count <- count + 1
+}
+
 # Write out the list of article and image links
-write.csv(matchmaker_article_links, file = 'matchmaker_files/matchmaker_article_links.csv')
+write.csv(matchmaker_article_links, 
+          file = 'matchmaker_files/matchmaker_article_links.csv')
 
 # Scrape the contents of each article
 

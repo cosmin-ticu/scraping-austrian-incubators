@@ -47,6 +47,18 @@ inits_article_links_DE <- get_links_inits_DE()
 # 3 articles showed up twice on account of having their own banner above the list
 inits_article_links_DE <- inits_article_links_DE[!duplicated(inits_article_links_DE$article_link)]
 
+# Download images outside of the scraping loop
+count <- 1
+for (i in inits_article_links_DE$img_link) {
+  if(!is.na(i) & !http_error(i)){
+    download.file(i,
+                  destfile = paste0("inits_files/inits_img",
+                                    count,'.png'),
+                  mode = 'wb')
+  }
+  count <- count + 1
+}
+
 # Get links of all INiTS articles in English (they have 2 pages of content)
 
 get_links_inits_EN <- function(){
@@ -83,6 +95,18 @@ get_links_inits_EN <- function(){
 }
 
 inits_article_links_EN <- get_links_inits_EN()
+
+# Download images outside of the scraping loop
+count <- 1
+for (i in inits_article_links_EN$img_link) {
+  if(!is.na(i) & !http_error(i)){
+    download.file(i,
+                  destfile = paste0("inits_files/inits_EN_img",
+                                    count,'.png'),
+                  mode = 'wb')
+  }
+  count <- count + 1
+}
 
 # Concatenate the 2 datasets
 

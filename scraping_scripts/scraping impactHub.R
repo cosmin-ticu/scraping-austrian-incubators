@@ -43,6 +43,18 @@ impactHub_article_links <- get_links_impactHub()
 # The articles without images are written in a different format --> remove them (small group anyway)
 impactHub_article_links <- impactHub_article_links[impactHub_article_links$img_link != "no_image",]
 
+# Download images outside of the scraping loop
+count <- 1
+for (i in impactHub_article_links$img_link) {
+  if(!is.na(i) & !http_error(i)){
+    download.file(i,
+                  destfile = paste0("impactHub_files/impactHub_img",
+                                    count,'.png'),
+                  mode = 'wb')
+  }
+  count <- count + 1
+}
+
 # Write out the list of article and image links
 write.csv(impactHub_article_links, file = 'impactHub_files/impactHub_article_links.csv')
 

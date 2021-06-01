@@ -30,6 +30,18 @@ techhouse_article_links[[1]][1] <- paste0("https://www.tech-house.io",techhouse_
 techhouse_article_links[[1]][2] <- paste0("https://www.tech-house.io",techhouse_article_links[[1]][2])
 techhouse_article_links[[1]][4] <- paste0("https://www.tech-house.io",techhouse_article_links[[1]][4])
 
+# Download images outside of the scraping loop
+count <- 1
+for (i in techhouse_article_links$img_link) {
+  if(!is.na(i) & !http_error(i)){
+    download.file(i,
+                  destfile = paste0("techhouse_files/techhouse_img",
+                                    count,'.png'),
+                  mode = 'wb')
+  }
+  count <- count + 1
+}
+
 # Write out the list of article and image links
 write.csv(techhouse_article_links, file = 'techhouse_files/techhouse_article_links.csv')
 

@@ -37,6 +37,18 @@ ventury_article_links <- ventury_article_links[ventury_article_links$article_lin
 
 ventury_article_links <- ventury_article_links[!duplicated(ventury_article_links$article_link),]
 
+# Download images outside of the scraping loop
+count <- 1
+for (i in ventury_article_links$img_link) {
+  if(!is.na(i) & !http_error(i)){
+    download.file(i,
+                  destfile = paste0("ventury_files/ventury_img",
+                                    count,'.png'),
+                  mode = 'wb')
+  }
+  count <- count + 1
+}
+
 # Write out the list of article and image links
 write.csv(ventury_article_links, file = 'ventury_files/ventury_article_links.csv')
 

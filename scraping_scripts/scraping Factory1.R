@@ -52,6 +52,19 @@ factory1_article_links <- factory1_article_links %>% add_row(article_link = "htt
 factory1_article_links <- factory1_article_links %>% add_row(article_link = "https://www.trendingtopics.at/these-5-international-startups-made-it-to-the-factory1-accelerator-of-kapsch/",
                                                              img_link = "https://www.trendingtopics.at/wp-content/uploads/2019/02/factory1-644x362.jpg")
 
+# Download images outside of loop
+count <- 1
+
+for (i in factory1_article_links$img_link) {
+  if(!http_error(factory1_article_links$img_link[count])){
+    download.file(factory1_article_links$img_link[count], 
+                  destfile = paste0("factory1_files/factory1_img", 
+                                    count,'.png'), 
+                  mode = 'wb')
+  }
+  count <- count + 1
+}
+
 # Write out the list of article and image links
 write.csv(factory1_article_links, file = 'factory1_files/factory1_article_links.csv')
 

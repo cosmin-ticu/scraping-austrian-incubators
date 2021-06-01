@@ -8,6 +8,10 @@ library(magrittr)
 # Get links of all Greenstart articles (they have 6 pages of content)
 
 get_links_greenstart <- function(){
+  
+  count <- 1
+  counter <- 1
+  
   links_to_get <- paste0('https://greenstart.at/aktuelles//page/',
                          1:6)
   ret_df <- rbindlist(lapply(links_to_get, function(greenstart_url){
@@ -26,6 +30,17 @@ get_links_greenstart <- function(){
     t_list[['img_link']] <- t %>% 
       html_nodes('.postteaser__list__item__image') %>%
       html_nodes('img') %>% html_attr('src')
+    
+    for (i in t_list[['img_link']]) {
+      if(!is.na(t_list[['img_link']][count]) & !http_error(t_list[['img_link']][count])){
+        download.file(t_list[['img_link']][count], 
+                      destfile = paste0("greenstart_files/greenstart_img", 
+                                        counter,'.png'), 
+                      mode = 'wb')
+      }
+      count <- count + 1
+      counter <<- counter + 1
+    }
     
     print(paste("Currently scraping:",greenstart_url))
     

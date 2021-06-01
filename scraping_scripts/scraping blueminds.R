@@ -4,6 +4,7 @@ library(rvest)
 library(xml2)
 library(data.table)
 library(magrittr)
+library(httr)
 
 # Get links of all Impact Hub articles (they have 20 pages of content back to 2015)
 
@@ -35,6 +36,18 @@ blueminds_article_links <- get_links_blueminds()
 
 # The articles without images are written in a different format --> remove them (small group anyway)
 blueminds_article_links <- blueminds_article_links[blueminds_article_links$img_link != "no_image",]
+
+# Download images outside of the scraping loop
+count <- 1
+for (i in blueminds_article_links$img_link) {
+  if(!is.na(blueminds_article_links$img_link[count]) & !http_error(blueminds_article_links$img_link[count])){
+    download.file(blueminds_article_links$img_link[count],
+                  destfile = paste0("blueminds_files/blueminds_img",
+                                    count,'.png'),
+                  mode = 'wb')
+  }
+  count <- count + 1
+}
 
 # Some articles showed up twice on account of having external links as well
 blueminds_article_links <- blueminds_article_links[!duplicated(blueminds_article_links$article_link),]
