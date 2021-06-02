@@ -80,9 +80,10 @@ nested_raw_content_sentiment <- unnested_raw_content_sentiment %>%
             positive = mean(Positive))
 
 # Write out the data ------------------------------------------------------
+nested_raw_content_sentiment <- rowid_to_column(nested_raw_content_sentiment, "ID")
 
 # Write base file containing full content
 write.csv(nested_raw_content_sentiment, 
-          file = "incubators_raw_content_languages_sentiment.csv",
+          file = "data/incubators_raw_content_languages_sentiment.csv",
           fileEncoding = "utf-8",
           row.names = F)
