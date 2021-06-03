@@ -11,7 +11,7 @@ library(paws.machine.learning)
 # Data setup --------------------------------------------------------------
 
 # Read base df of all content
-incubators_raw_content <- read.csv(file = "data/incubators_raw_content.csv",
+incubators_raw_content <- read.csv(file = "data/incubators_raw_content_languages_sentiment.csv",
                                        fileEncoding = "utf-8")
 
 # Set up AWS in R
@@ -30,7 +30,7 @@ Sys.setenv("AWS_ACCESS_KEY_ID" = AWS_ACCESS_KEY_ID,
 # Keep only links
 imgs_to_download <- incubators_raw_content[
   incubators_raw_content$img_link != "no_image",] %>% 
-  select(c(img_link,creator))
+  select(c(img_link,creator,ID))
 
 # Download all of the images from every incubator 
 # - unfortunately, URLs that contain special characters are excluded
@@ -42,7 +42,7 @@ for (i in 1:nrow(imgs_to_download)) {
     tryCatch(download.file(imgs_to_download$img_link[i],
                   destfile = paste0("incubators_images/", 
                                     imgs_to_download$creator[i],
-                                    i,'.jpg'),
+                                    imgs_to_download$ID[i],'.jpg'),
                   mode = 'wb'),
              
              error = function(e) print(paste0(imgs_to_download$img_link[i], 
@@ -56,7 +56,8 @@ for (i in 1:nrow(imgs_to_download)) {
 
 # Upload all images to S3 for processing with AWS Rekognition
 s3sync(path = 'incubators_images', 
-       bucket = 'cosmin-ceu-2020', 
+       bucket = 'cosmin-ceu-2020',
+       prefix = 'ilab-capstone/',
        direction = 'upload', 
        verbose = T, 
        recursive = T)
@@ -76,7 +77,7 @@ all_incubator_labels <- rbindlist(
       config = list(region = "eu-west-1"))
     
     # Define image names to search for
-    picture <- get_bucket_df(prefix = incubator,bucket = 'cosmin-ceu-2020') %>% 
+    picture <- get_bucket_df(prefix = paste0("ilab-capstone/",incubator),bucket = 'cosmin-ceu-2020') %>% 
       select("Key") %>% 
       list()
     picture <- picture[[1]]$Key
@@ -93,16 +94,14 @@ all_incubator_labels <- rbindlist(
       # Convert output into a friendly data frame
       df <- lapply(gicu$Labels, `[`, c('Name', 'Confidence'))
       df <- rbindlist(df)
+      df$ID <- rep(parse_number(str_sub(x, -7, -1)))
       return(df)
       
     }))
     
     # Combine all picture outputs into data frame with incubator label
-    out_df <- ret_df %>% 
-      group_by(Name) %>% 
-      summarise(Label_Confidence = mean(Confidence),
-                count = n())
-    out_df["Creator"] <- incubator
+    out_df <- ret_df
+    out_df$Creator <- rep(incubator)
     return(out_df)
   
 }))
@@ -111,6 +110,6 @@ all_incubator_labels <- rbindlist(
 
 # Write image label recognition file for analysis
 write.csv(all_incubator_labels , 
-          file = "data/incubators_image_10_entities.csv",
+          file = "data/incubators_images_10_entities.csv",
           fileEncoding = "utf-8",
           row.names = F)
