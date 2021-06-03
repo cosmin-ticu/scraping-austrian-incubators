@@ -97,7 +97,7 @@ all_incubator_labels <- rbindlist(
       df$ID <- rep(parse_number(str_sub(x, -7, -1)))
       return(df)
       
-    }))
+    }), fill = T)
     
     # Combine all picture outputs into data frame with incubator label
     out_df <- ret_df
